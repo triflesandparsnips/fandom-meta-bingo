@@ -19,7 +19,7 @@ class Word {
             textStyle(NORMAL);
         }
         fill(this.color);
-        text(this.word, this.x, this.y);
+        text(this.word, this.x, this.y, 100);
     }
 
     highlight() {
@@ -33,10 +33,10 @@ class Word {
     }
 
     intersect(x, y) {
-        let radius = 3;
+        let radius = 4;
 
-        let xIntersect = x > this.x - textWidth(this.word)/2 - radius && x < this.x + textWidth(this.word)/2 + radius;
-        let yIntersect = y > this.y - textSize(this.word)/2 - radius && y < this.y + textSize(this.word)/2 + radius;
+        let xIntersect = x > this.x - 100 - radius && x < this.x + 50 + radius;
+        let yIntersect = y > this.y - 20 - radius && y < this.y + 20 + radius;
 
         if (xIntersect && yIntersect) {
             return true;
