@@ -1,79 +1,98 @@
-let soothing = [];
-let symbols = [];
-let common = [];
+// fork from Concrete Nest at https://github.com/vividfax/concrete-nest
+
+let img;
+
+let metaTiles = [];
 let selected = [];
-let nested = [];
+let bingoed = [];
 
 let circles = [];
 
-let nestDrawn = false;
+let bingoDrawn = false;
+
+
+// Color palette by whirledpeace at https://www.colourlovers.com/palette/818229/Cant_Compare_101
 
 let colors = {
-	black: "#505168",
-	dark: "#597068",
-	medium: "#73856F",
-	light: "#A6BD85",
-	white: "#E9EED2"
+	black: '#021418',
+    dark: '#19B5A5',
+    medium: '#FF0048',
+    light: '#FF6933',
+	white: '#fcfcfa'
 }
 
+
+// preloads the meta tiles
+
 function preload() {
-	soothing = loadStrings("comforting.txt");
-	soothing.pop();
-	common = loadStrings("common.txt");
-	common.pop();
-	symbols = loadStrings("symbols.txt");
-	symbols.pop();
+    img = loadImage('assets/ofmd_blank1.png')
+    metaTiles = loadStrings('assets/ofmdmetatiles.txt');
+	metaTiles.pop();
 }
+
+
+// sets up canvas size, font, and centering, as well as calling some abilities
 
 function setup() {
 	createCanvas(windowWidth, windowHeight);
-	textAlign(CENTER, CENTER);
-	textFont("Courier");
-	textSize(16);
+    textAlign(CENTER, CENTER);
+	textFont('Arial Black');
 
 	createCircles();
 	selectWords();
-
-	playAudio();
 }
 
-function draw() {
-	background(colors.light);
 
-	if (!nestDrawn) {
-		drawNest();
+// function to actually draw the sketch; if there's no meta moved into the center of the card, the instructions are visible 
+
+function draw() {
+	background(colors.white);
+
+   	image(img, width/2, 0, 750, 750)
+  
+	if (!bingoDrawn) {
 		loadPixels();
 		set(get());
 		updatePixels()
-		nestDrawn = true;
+		bingoDrawn = true;
 	} else {
 		updatePixels();
 	}
-	if (nested.length == 0) {
+	if (bingoed.length == 0) {
 		drawHint();
 	}
-	else {drawSaveButton(20 + 75, 40, saveButtonHover());}
-	drawWanderButton(width / 4, height - 40, wanderButtonHover());
 
+  
+// draws the save button and applies the button hover action
+  
+	else {drawSaveButton(20 + 75, 40, saveButtonHover());}
+
+  
+// draws the more-meta button and applies the button hover action
+  
+	drawStabAgainButton(width / 7, height - 40, stabAgainButtonHover());
+
+
+// lists the functions that get drawn in the sketch
+  
 	sortWords();
 	drawWords();
-	mouseOver();
+//	mouseOver();
+  
 }
+
+
+// function that I think randomizes the meta in the string file, and creates the "newWord" to reference later
 
 function selectWords() {
 
 	for (let i = 0; i < 5; i++) {
-		newWord(random(soothing), 16);
-	}
-	if (random() > .5) {
-		for (let i = 0; i < 1; i++) {
-			newWord(random(symbols), 20);
-		}
-	}
-	for (let i = 2; i < 300; i++) {
-		newWord(random(common), 16);
+		newWord(random(metaTiles), 16);
 	}
 }
+
+
+// function that defines what the more-meta button does when you click it, specifically redrawing the constraining circle and pulling meta into it from the meta pre-selected from the sorting function
 
 function refreshWords() {
 
@@ -83,95 +102,117 @@ function refreshWords() {
 	selectWords();
 }
 
+
+// function that I think generates the chosen meta and makes sure it appears in the constraining circle
+
 function newWord(word, fontSize) {
-
-	let x = random(width)/4 + width/8;
-	let y = random(height)/2 + height/4;
-
-	for (i in selected) {
-
-		if (dist(x, y, selected[i].x, selected[i].y) < 55) {
-			return;
+  
+  let x = random(width)/4 + width/8;
+  let y = random(height)/2 + height/4;
+  
+  for (i in selected) {
+	if (dist(x, y, selected[i].x, selected[i].y) < 55) {
+		return;
 		}
-	}
-	let inCircle = false;
+  }
+  let inCircle = false;
 
-	for (i in circles) {
+  for (i in circles) {
 
-		if (dist(x, y, circles[i].x, circles[i]. y) < circles[i].r/2) {
-			inCircle = true;
+	if (dist(x, y, circles[i].x, circles[i]. y) < circles[i].r/2) {
+		inCircle = true;
 		}
-	}
+  }
 	if (!inCircle) {
 		return;
-	}
-	return selected.push(new Word(word, x, y, fontSize));
+	    }
+  return selected.push(new Word(word, x, y, fontSize));
 }
+
+
+// function that writes the actual instructions
 
 function drawHint() {
+  
+  let hint = 'drag and drop meta\nto arrange your card and\nclick Get More Booty\nto get more options!';
+  textStyle(NORMAL);
+  textSize(18);
+  fill(colors.light);
+  text(hint, 200, 100);
 
-	textStyle(NORMAL);
-	textSize(16);
-	fill(colors.white);
-	text("drag and drop words\nto arrange your nest", width/4*3, height/2);
 }
 
-function drawWanderButton(x, y, color) {
+// function that actually draws the more-meta button and allows for the flip between the white and orange lettering
 
-	let w = 150;
-	let h = 40;
+function drawStabAgainButton(x, y, color) {
 
-	textStyle(NORMAL);
-	fill(color);
-	noStroke();
-	rect(x - w/2, y - h/2, w, h, 5);
+  let w = 200;
+  let h = 40;
 
-	if (color == colors.medium) {
+  textStyle(NORMAL);
+  fill(colors.dark)
+  stroke('#222222');
+  strokeWeight();
+  rect(x - w/2, y - h/2, w, h, 5);
+
+  if (color == colors.white) {
+	fill(colors.light);
+	} else {
 		fill(colors.white);
-	} else {
-		noFill();
-	}
-	textSize(16);
-	text("wander", x, y);
+	}textSize(16);
+	text("get more booty!", x, y);
 	textSize(16);
 }
 
-function wanderButtonHover() {
 
-	if (mouseX > width/4 - 150/2 && mouseX < width/4 + 150/2 && mouseY > height - 40 - 40/2 && mouseY < height - 40 + 40/2) {
-		return colors.medium;
+// function that defines where cursor can "click" the more-meta button (maybe defines where the button is on the canvas?)
+
+function stabAgainButtonHover() {
+
+	if (mouseX > width/4 - 200/2 && mouseX < width/4 + 200/2 && mouseY > height - 40 - 40/2 && mouseY < height + 40 + 40/2) {
+		return colors.white;
 	} else {
-		return "#849876";
+		return "#236269";
 	}
 }
+
+
+// function that actually draws the save button and allows for the flip between the white and orange lettering
 
 function drawSaveButton(x, y, color) {
 
-	let w = 150;
-	let h = 40;
+  let w = 150;
+  let h = 40;
 
-	textStyle(NORMAL);
-	fill(color)
-	noStroke();
-	rect(x - w/2, y - h/2, w, h, 5);
+  textStyle(NORMAL);
+  fill(colors.dark)
+  stroke('#222222');
+  strokeWeight();
+  rect(x - w/2, y - h/2, w, h, 5);
 
-	if (color == colors.white) {
-		fill(colors.dark);
+  if (color == colors.white) {
+	  fill(colors.light);
 	} else {
-		noFill();
+	  fill(colors.white);
 	}textSize(16);
-	text("save image", x, y);
+	text("save card", x, y);
 	textSize(16);
 }
 
+
+// function that defines where cursor can "click" the save button (maybe defines where the button is on the canvas?)
+
 function saveButtonHover() {
 
-	if (mouseX > 20 && mouseX < 20+150 && mouseY > 20 && mouseY < 20 + 40) {
-		return colors.white;
-	} else {
-		return "#C8D6AC";
-	}
+  if (mouseX > 20 && mouseX < 20+150 && mouseY > 20 && mouseY < 20 + 40) {
+	return colors.white;
+  } else {
+	return "#236269";
+  }
 }
+
+
+// function that results in different actions (refreshing the meta list or saving a pick) if mouse clicked on specific areas where the buttons are
 
 function mouseClicked() {
 
@@ -180,9 +221,12 @@ function mouseClicked() {
 	}
 	if (mouseX > 20 && mouseX < 20+150 && mouseY > 20 && mouseY < 20 + 40) {
 		let image = get(width/2, 0, width/2, height);
-		save(image, "nest.png");
+		save(image, "ofmd-meta-bingo-card.png");
 	}
 }
+
+
+// function that I think removes the used meta from the list after it's added to the bingo card
 
 function sortWords() {
 
@@ -192,39 +236,47 @@ function sortWords() {
 
 		if (selected[i].x > width/2) {
 			shift = selected.splice(i, 1);
-			nested.push(shift[0]);
+			bingoed.push(shift[0]);
 		}
 	}
-	for (i in nested) {
+	for (i in bingoed) {
 
 		let shift;
 
-		if (nested[i].x <= width/2) {
-			shift = nested.splice(i, 1);
+		if (bingoed[i].x <= width/2) {
+			shift = bingoed.splice(i, 1);
 			selected.push(shift[0]);
 		}
 	}
 }
+
+
+// function that draws the words depending on whether they're in the constraining circle or on the bingo card
 
 function drawWords() {
 
 	for (let i = 0; i < selected.length; i++) {
 		selected[i].display();
 	}
-	for (let i = 0; i < nested.length; i++) {
-		nested[i].display();
+	for (let i = 0; i < bingoed.length; i++) {
+		bingoed[i].display();
 	}
 }
 
+
+// function that maybe creates the smaller random circles where the meta appears, but without the circles the meta won't appear -- also defines where on the canvas the circles appear
 
 function createCircles() {
 
-	for (let i = 0; i < 10; i++) {
-		circles.push(new Circle(random(width)/4 + width/8, random(height/2) + height/4, random(height/4)));
-	}
+  for (let i = 0; i < 10; i++) {
+	circles.push(new Circle(random(width)/4 + width/8, random(height/2) + height/4, random(height/4)));
+  }
 }
 
-function mouseOver() {
+
+// function that I think in the original would turn text dark or light if mouse selects the meta
+
+ function mouseOver() {
 
 	for (i in selected) {
 
@@ -234,15 +286,18 @@ function mouseOver() {
 			selected[i].lowlight();
 		}
 	}
-	for (i in nested) {
+	for (i in bingoed) {
 
-		if (nested[i].intersect(mouseX, mouseY)) {
-			nested[i].highlight();
+		if (bingoed[i].intersect(mouseX, mouseY)) {
+			bingoed[i].highlight();
 		} else {
-			nested[i].lowlight();
+			bingoed[i].lowlight();
 		}
 	}
 }
+
+
+// function that allows the meta to be clicked and dragged
 
 function mousePressed() {
 
@@ -254,25 +309,29 @@ function mousePressed() {
 			selected[i].drag = false;
 		}
 	}
-	for (i in nested) {
+	for (i in bingoed) {
 
-		if (nested[i].intersect(mouseX, mouseY)) {
-			nested[i].drag = true;
+		if (bingoed[i].intersect(mouseX, mouseY)) {
+			bingoed[i].drag = true;
 		} else {
-			nested[i].drag = false;
+			bingoed[i].drag = false;
 		}
 	}
 }
+
 
 function mouseReleased() {
 
 	for (i in selected) {
 		selected[i].drag = false;
 	}
-	for (i in nested) {
-		nested[i].drag = false;
+	for (i in bingoed) {
+		bingoed[i].drag = false;
 	}
 }
+
+
+// function that allows the meta to be clicked and dragged -- how is it different from the previous function?
 
 function mouseDragged() {
 	let selectionCounter = 0;
@@ -286,48 +345,22 @@ function mouseDragged() {
 		}
 	}
 	selectionCounter = 0;
-	for (i in nested) {
-		if (nested[i].drag) {
+	for (i in bingoed) {
+		if (bingoed[i].drag) {
 			selectionCounter++;
 			offset = getOffset(selectionCounter);
-			nested[i].x = mouseX;
-			nested[i].y = mouseY + offset;
+			bingoed[i].x = mouseX;
+			bingoed[i].y = mouseY + offset;
 		}
 	}
 }
 
+
+// function that separates the meta if the randomizer or the user overlays each of them by accident
+
 function getOffset(numberOfItems) {
 	if (numberOfItems > 1) {
-		return (numberOfItems-1) * 4; // moves the word 4 pixels down
+		return (numberOfItems-1) * 20; // moves the word 20 pixels down
 	}
 	else return 0;
-}
-
-function drawNest() {
-
-	drawLines(colors.black);
-	drawLines(colors.dark);
-	drawLines(colors.medium);
-	drawLines(colors.white);
-	drawLines(colors.light);
-	drawLines(colors.light);
-	drawLines(colors.light);
-	drawLines(colors.light);
-	drawLines(colors.light);
-}
-
-function drawLines(color) {
-
-	let pad = 20;
-
-	for (let i = 0; i < 500; i++) {
-		stroke(color);
-		line(random(width/2 + 20, width - pad), random(pad, height - pad), random(width/2 + 20, width - pad), random(pad, height - pad));
-	}
-}
-
-function playAudio() {
-	var audio = new Audio("susurration.ogg");
-	audio.loop = true;
-	audio.play();
 }
