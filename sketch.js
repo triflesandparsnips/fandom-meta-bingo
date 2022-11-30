@@ -216,7 +216,7 @@ function saveButtonHover() {
 
 function mouseClicked() {
 
-	if (mouseX > width/4 - 150/2 && mouseX < width/4 + 150/2 && mouseY > height - 40 - 40/2 && mouseY < height - 40 + 40/2) {
+	if (mouseX > width/4 - 200/2 && mouseX < width/4 + 200/2 && mouseY > height - 40 - 40/2 && mouseY < height - 40 + 40/2) {
 		refreshWords();
 	}
 	if (mouseX > 20 && mouseX < 20+150 && mouseY > 20 && mouseY < 20 + 40) {
