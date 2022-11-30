@@ -169,7 +169,7 @@ function drawStabAgainButton(x, y, color) {
 
 function stabAgainButtonHover() {
 
-	if (mouseX > width/4 - 200/2 && mouseX < width/4 + 200/2 && mouseY > height - 40 - 40/2 && mouseY < height + 40 + 40/2) {
+	if (mouseX > width/7 - 200/2 && mouseX < width/7 + 200/2 && mouseY > height - 40 - 40/2 && mouseY < height + 40 + 40/2) {
 		return colors.white;
 	} else {
 		return "#236269";
@@ -216,7 +216,7 @@ function saveButtonHover() {
 
 function mouseClicked() {
 
-	if (mouseX > width/4 - 200/2 && mouseX < width/4 + 200/2 && mouseY > height - 40 - 40/2 && mouseY < height - 40 + 40/2) {
+	if (mouseX > width/7 - 200/2 && mouseX < width/7 + 200/2 && mouseY > height - 40 - 40/2 && mouseY < height - 40 + 40/2) {
 		refreshWords();
 	}
 	if (mouseX > 20 && mouseX < 20+150 && mouseY > 20 && mouseY < 20 + 40) {
